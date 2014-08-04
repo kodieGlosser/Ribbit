@@ -67,7 +67,7 @@ public class LoginActivity extends Activity {
 						
 					@Override
 					public void done(ParseUser user, ParseException e) {
-						setProgressBarIndeterminateVisibility(true);
+						setProgressBarIndeterminateVisibility(false);
 						
 						if (e == null) {
 							// success!

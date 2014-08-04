@@ -1,6 +1,9 @@
 package com.kodieglosser.ribbit;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -38,6 +41,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	public static final int MEDIA_TYPE_IMAGE = 4;
 	public static final int MEDIA_TYPE_VIDEO = 5;
 	
+	public static final int FILE_SIZE_LIMIT = 1024*1024*10; // 10 mb
 	protected Uri mMediaUri;
 	
 	protected DialogInterface.OnClickListener mDialogListener = new DialogInterface.OnClickListener() {
@@ -57,10 +61,28 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 					}
 					break;
 				case 1: // t v
+					Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+					mMediaUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
+					if(mMediaUri == null) {
+						Toast.makeText(MainActivity.this, R.string.error_external_storages, Toast.LENGTH_LONG).show();
+					}
+					else {
+						takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri);
+						takeVideoIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 10);
+						takeVideoIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
+						startActivityForResult(takeVideoIntent, TAKE_VIDEO_REQUEST);
+					}
 					break;
 				case 2: // c p 
+					Intent choosePhotoIntent = new Intent(Intent.ACTION_GET_CONTENT);
+					choosePhotoIntent.setType("image/*");
+					startActivityForResult(choosePhotoIntent, CHOOSE_PHOTO_REQUEST);
 					break;
 				case 3: // c v
+					Intent chooseVideoIntent = new Intent(Intent.ACTION_GET_CONTENT);
+					chooseVideoIntent.setType("video/*");
+					Toast.makeText(MainActivity.this,  R.string.video_file_size_warning, Toast.LENGTH_LONG).show();
+					startActivityForResult(chooseVideoIntent, CHOOSE_VIDEO_REQUEST);
 					break;
 			}
 			
@@ -181,9 +203,49 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     	
     	if (resultCode == RESULT_OK) {
     		// add to gallery
-    		Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-    		mediaScanIntent.setData(mMediaUri);
-    		sendBroadcast(mediaScanIntent);
+    		
+    		if (requestCode == CHOOSE_PHOTO_REQUEST || requestCode == CHOOSE_VIDEO_REQUEST) {
+    			if (data == null) {
+    				Toast.makeText(this, getString(R.string.general_error), Toast.LENGTH_LONG).show();
+    			}
+    			else {
+    				mMediaUri = data.getData();
+    			}
+    			Log.i(TAG, "Media URI: " + mMediaUri);
+    			if (requestCode == CHOOSE_VIDEO_REQUEST) {
+    				// check filesize
+    				int fileSize = 0;
+    				InputStream inputStream = null;
+    				try {
+    					inputStream = getContentResolver().openInputStream(mMediaUri);
+    					fileSize = inputStream.available();
+    				}
+    				catch (FileNotFoundException e) { 
+    					Toast.makeText(this, R.string.error_opening_file, Toast.LENGTH_LONG).show();
+    					return;
+    				}
+					catch (IOException e) { 
+						Toast.makeText(this, R.string.error_opening_file, Toast.LENGTH_LONG).show();
+						return;
+					}
+    				finally { 
+    					try {
+							inputStream.close();
+						} 
+    					catch (IOException e) {
+						}
+    				}
+    				if (fileSize >= FILE_SIZE_LIMIT) {
+    					Toast.makeText(this, R.string.video_length_too_long, Toast.LENGTH_LONG).show();
+    					return;
+    				}
+    			}
+    		}
+    		else {
+	    		Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+	    		mediaScanIntent.setData(mMediaUri);
+	    		sendBroadcast(mediaScanIntent);
+    		}
     	}
     	else if (resultCode != RESULT_CANCELED) {
     		Toast.makeText(this, R.string.general_error, Toast.LENGTH_LONG).show();
