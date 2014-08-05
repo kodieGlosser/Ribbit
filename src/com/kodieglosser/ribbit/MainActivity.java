@@ -43,7 +43,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	
 	public static final int FILE_SIZE_LIMIT = 1024*1024*10; // 10 mb
 	protected Uri mMediaUri;
-	
+
 	protected DialogInterface.OnClickListener mDialogListener = new DialogInterface.OnClickListener() {
 		
 		@Override
@@ -195,7 +195,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      					.setTabListener(this));
      		}
     }
-
+    
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	// TODO Auto-generated method stub
