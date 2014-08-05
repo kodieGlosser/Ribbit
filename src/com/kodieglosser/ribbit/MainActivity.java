@@ -250,7 +250,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     		Intent recipientsIntent = new Intent(this, RecipientsActivity.class);
     		recipientsIntent.setData(mMediaUri);
     		String fileType;
-    		if(requestCode == CHOOSE_PHOTO_REQUEST || requestCode = TAKE_PHOTO_REQUEST) {
+    		if(requestCode == CHOOSE_PHOTO_REQUEST || requestCode == TAKE_PHOTO_REQUEST) {
     			fileType = ParseConstants.TYPE_IMAGE;
     		}
     		else {
