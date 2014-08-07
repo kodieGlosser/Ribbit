@@ -74,7 +74,16 @@ public class MainActivity extends FragmentActivity implements
 					Toast.makeText(MainActivity.this,
 							R.string.error_external_storages, Toast.LENGTH_LONG)
 							.show();
-				} else {
+				} 
+				else {
+					
+					AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+					builder.setMessage(mMediaUri.toString())
+						.setTitle(R.string.error_selecting_file_title)
+						.setPositiveButton(android.R.string.ok, null);
+					AlertDialog dialog1 = builder.create();
+					dialog1.show();
+					
 					takeVideoIntent
 							.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri);
 					takeVideoIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT,
@@ -212,7 +221,6 @@ public class MainActivity extends FragmentActivity implements
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 
 		if (resultCode == RESULT_OK) {

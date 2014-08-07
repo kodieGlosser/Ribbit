@@ -166,6 +166,7 @@ public class RecipientsActivity extends ListActivity {
 		message.put(ParseConstants.KEY_FILE_TYPE, mFileType);
 		
 		byte[] fileBytes = FileHelper.getByteArrayFromFile(this, mMediaUri);
+
 		
 		if (fileBytes == null) {
 			return null;
